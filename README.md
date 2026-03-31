@@ -1,51 +1,37 @@
 # ⚔️ Pixel Quest - Idle RPG
 
-A Telegram Mini App with TON wallet integration.
+Telegram Mini App dengan TON wallet integration untuk game RPG idle.
 
-## Features
+## 🎮 Features
 
-- 🎮 **Idle RPG Gameplay** - Auto-battle monsters, gain XP and loot
-- 💎 **Crystal Rewards** - Earn crystals from battles
-- 👛 **TON Wallet** - Connect wallet for deposits and withdrawals
-- 🛒 **Shop System** - Buy potions and boosts
-- 📜 **Quest System** - Complete quests for rewards
-- 🦸 **Hero Classes** - 4 unique classes with different stats
+- **4 Hero Classes**: Warrior, Mage, Archer, Assassin
+- **Idle Battle System**: Auto-battle dengan monster
+- **TON Wallet**: Connect wallet untuk deposit & withdraw
+- **Crystal Token**: Reward system yang bisa di-withdraw
+- **Equipment System**: Gacha eggs untuk equipment
+- **Quest System**: Daily quests untuk rewards
 
-## Hero Classes
+## 🚀 Deploy ke Vercel
 
-| Class | HP | ATK | DEF | Crit |
-|-------|----|----|-----|------|
-| ⚔️ Warrior | 150 | 20 | 15 | 10% |
-| 🔮 Mage | 80 | 35 | 5 | 20% |
-| 🏹 Archer | 100 | 25 | 10 | 25% |
-| 🗡️ Assassin | 70 | 30 | 5 | 35% |
+1. Fork repo ini
+2. Import ke Vercel
+3. Deploy otomatis (Next.js terdeteksi)
 
-## Getting Started
+## 🛠️ Development
 
-```bash
-# Install dependencies
+\`\`\`bash
 bun install
-
-# Run development server
 bun run dev
+\`\`\`
 
-# Build for production
-bun run build
-```
+## 📱 Telegram Mini App
 
-## Deploy to Vercel
+Setelah deploy, daftarkan URL di BotFather:
+1. Chat dengan @BotFather
+2. `/newapp` atau `/editapp`
+3. Masukkan URL Vercel kamu
 
-1. Push to GitHub
-2. Import repository in Vercel
-3. Deploy (no config needed!)
+## 🔗 Links
 
-## Tech Stack
-
-- **Next.js 14** - React framework
-- **Zustand** - State management
-- **Framer Motion** - Animations
-- **TON Connect** - Wallet integration
-
-## License
-
-MIT
+- [GitHub](https://github.com/buffedgecko/pixel-rpg-app)
+- [TON Connect](https://github.com/ton-connect/sdk)
