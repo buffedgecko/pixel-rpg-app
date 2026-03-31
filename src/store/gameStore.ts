@@ -10,15 +10,11 @@ export interface Hero {
   class: HeroClass
   level: number
   exp: number
-  maxExp: number
   hp: number
   maxHp: number
   attack: number
   defense: number
   critRate: number
-  crystals: number
-  gold: number
-  lastActive: number
 }
 
 export interface Monster {
@@ -26,7 +22,6 @@ export interface Monster {
   name: string
   emoji: string
   hp: number
-  maxHp: number
   attack: number
   defense: number
   crystals: number
@@ -36,205 +31,227 @@ export interface ShopItem {
   id: string
   name: string
   description: string
-  price: number
-  currency: 'gold' | 'crystals'
-  category: 'potion' | 'boost' | 'special'
+  crystalPrice: number
+  category: 'egg' | 'potion'
   emoji: string
+}
+
+export interface Quest {
+  id: string
+  name: string
+  description: string
+  target: number
+  reward: number
+  type: 'battle' | 'collect' | 'level'
+}
+
+export interface PlayerQuest {
+  id: string
+  progress: number
+  claimed: boolean
 }
 
 export interface Transaction {
   id: string
-  type: 'deposit' | 'withdraw' | 'purchase'
+  type: 'earn' | 'spend'
   amount: number
   timestamp: number
 }
 
-// Hero Class Data
-export const HERO_CLASSES: Record<HeroClass, { name: string; emoji: string; color: string; desc: string }> = {
-  warrior: { name: 'Warrior', emoji: '⚔️', color: '#ef4444', desc: 'High HP & Defense' },
-  mage: { name: 'Mage', emoji: '🔮', color: '#8b5cf6', desc: 'High Attack & Crit' },
-  archer: { name: 'Archer', emoji: '🏹', color: '#22c55e', desc: 'Balanced Stats' },
-  assassin: { name: 'Assassin', emoji: '🗡️', color: '#6366f1', desc: 'Highest Crit Rate' },
+export interface Battle {
+  monster: string
+  monsterHp: number
+  heroHp: number
 }
 
-// Shop Items
+export const HERO_CLASSES: Record<HeroClass, { name: string; emoji: string; color: string; desc: string }> = {
+  warrior: { name: 'Warrior', emoji: '⚔️', color: '#ef4444', desc: 'Tank with high HP' },
+  mage: { name: 'Mage', emoji: '🔮', color: '#8b5cf6', desc: 'High damage dealer' },
+  archer: { name: 'Archer', emoji: '🏹', color: '#22c55e', desc: 'Balanced fighter' },
+  assassin: { name: 'Assassin', emoji: '🗡️', color: '#6366f1', desc: 'High crit rate' },
+}
+
+export const MONSTERS: Record<string, Monster> = {
+  slime: { id: 'slime', name: 'Slime', emoji: '🟢', hp: 30, attack: 5, defense: 2, crystals: 5 },
+  goblin: { id: 'goblin', name: 'Goblin', emoji: '👺', hp: 50, attack: 8, defense: 3, crystals: 10 },
+  skeleton: { id: 'skeleton', name: 'Skeleton', emoji: '💀', hp: 70, attack: 12, defense: 4, crystals: 15 },
+  orc: { id: 'orc', name: 'Orc', emoji: '👹', hp: 100, attack: 15, defense: 6, crystals: 20 },
+  demon: { id: 'demon', name: 'Demon', emoji: '😈', hp: 150, attack: 20, defense: 8, crystals: 35 },
+  dragon: { id: 'dragon', name: 'Dragon', emoji: '🐉', hp: 200, attack: 30, defense: 12, crystals: 50 },
+}
+
 export const SHOP_ITEMS: ShopItem[] = [
-  { id: 'hp_potion', name: 'HP Potion', description: 'Restore 50 HP', price: 100, currency: 'gold', category: 'potion', emoji: '❤️' },
-  { id: 'attack_boost', name: 'Attack Boost', description: '+30% ATK for 3 battles', price: 200, currency: 'gold', category: 'boost', emoji: '💪' },
-  { id: 'crit_boost', name: 'Crit Boost', description: '+20% Crit for 5 battles', price: 150, currency: 'gold', category: 'boost', emoji: '🎯' },
-  { id: 'mega_potion', name: 'Mega Potion', description: 'Full HP restore', price: 50, currency: 'crystals', category: 'potion', emoji: '💎' },
+  { id: 'egg_common', name: 'Common Egg', description: 'Random equipment', crystalPrice: 100, category: 'egg', emoji: '🥚' },
+  { id: 'egg_rare', name: 'Rare Egg', description: 'Rare equipment', crystalPrice: 300, category: 'egg', emoji: '🥚' },
+  { id: 'egg_legendary', name: 'Legendary Egg', description: 'Legendary equipment', crystalPrice: 1000, category: 'egg', emoji: '🥚' },
+  { id: 'potion_hp', name: 'Health Potion', description: 'Restore 50 HP', crystalPrice: 50, category: 'potion', emoji: '❤️' },
+  { id: 'potion_atk', name: 'Attack Potion', description: '+10 ATK temporarily', crystalPrice: 150, category: 'potion', emoji: '⚔️' },
 ]
 
-// Monsters by level
-export const MONSTERS = [
-  { name: 'Slime', emoji: '🟢', hp: 30, attack: 5, defense: 2, crystals: 5 },
-  { name: 'Goblin', emoji: '👺', hp: 50, attack: 8, defense: 3, crystals: 10 },
-  { name: 'Skeleton', emoji: '💀', hp: 70, attack: 12, defense: 4, crystals: 15 },
-  { name: 'Orc', emoji: '👹', hp: 100, attack: 15, defense: 6, crystals: 20 },
-  { name: 'Demon', emoji: '😈', hp: 150, attack: 20, defense: 8, crystals: 35 },
-  { name: 'Dragon', emoji: '🐉', hp: 200, attack: 30, defense: 15, crystals: 50 },
+export const QUESTS: Quest[] = [
+  { id: 'q1', name: 'First Steps', description: 'Win 10 battles', target: 10, reward: 100, type: 'battle' },
+  { id: 'q2', name: 'Monster Hunter', description: 'Win 50 battles', target: 50, reward: 500, type: 'battle' },
+  { id: 'q3', name: 'Crystal Collector', description: 'Collect 1000 crystals', target: 1000, reward: 200, type: 'collect' },
+  { id: 'q4', name: 'Rising Star', description: 'Reach level 5', target: 5, reward: 300, type: 'level' },
 ]
 
-// Game State
+const MONSTER_KEYS = Object.keys(MONSTERS)
+
 interface GameState {
   hero: Hero | null
-  currentMonster: Monster | null
-  battleLog: string[]
-  isAutoBattle: boolean
-  battleCount: number
-  pendingWithdraw: number
+  crystals: number
+  quests: PlayerQuest[]
   transactions: Transaction[]
-  
+  battle: Battle | null
+  isBattling: boolean
   createHero: (name: string, heroClass: HeroClass) => void
   startBattle: () => void
-  stopBattle: () => void
-  autoBattle: () => void
-  heal: (amount: number) => void
-  buyItem: (itemId: string) => boolean
+  toggleBattling: () => void
+  buyItem: (itemId: string) => void
+  claimQuest: (questId: string) => void
   addCrystals: (amount: number) => void
-  withdraw: (amount: number) => void
-  reset: () => void
 }
 
-// Helper
-const generateId = () => Math.random().toString(36).substr(2, 9)
-
-const getBaseStats = (heroClass: HeroClass) => {
-  const stats = {
-    warrior: { hp: 150, attack: 20, defense: 15, crit: 0.1 },
-    mage: { hp: 80, attack: 35, defense: 5, crit: 0.2 },
-    archer: { hp: 100, attack: 25, defense: 10, crit: 0.25 },
-    assassin: { hp: 70, attack: 30, defense: 5, crit: 0.35 },
-  }
-  return stats[heroClass]
-}
+const createTransaction = (type: 'earn' | 'spend', amount: number): Transaction => ({
+  id: Date.now().toString() + Math.random().toString(36).slice(2),
+  type,
+  amount,
+  timestamp: Date.now(),
+})
 
 export const useGameStore = create<GameState>()(
   persist(
     (set, get) => ({
       hero: null,
-      currentMonster: null,
-      battleLog: [],
-      isAutoBattle: false,
-      battleCount: 0,
-      pendingWithdraw: 0,
+      crystals: 100,
+      quests: QUESTS.map(q => ({ id: q.id, progress: 0, claimed: false })),
       transactions: [],
+      battle: null,
+      isBattling: false,
 
       createHero: (name, heroClass) => {
-        const base = getBaseStats(heroClass)
-        const hero: Hero = {
-          id: generateId(),
-          name,
-          class: heroClass,
-          level: 1,
-          exp: 0,
-          maxExp: 100,
-          hp: base.hp,
-          maxHp: base.hp,
-          attack: base.attack,
-          defense: base.defense,
-          critRate: base.crit,
-          crystals: 0,
-          gold: 500,
-          lastActive: Date.now(),
-        }
-        set({ hero, battleLog: ['🗡️ Your adventure begins!'] })
+        const baseHp = heroClass === 'warrior' ? 150 : heroClass === 'mage' ? 80 : heroClass === 'archer' ? 100 : 70
+        const baseAtk = heroClass === 'warrior' ? 25 : heroClass === 'mage' ? 40 : heroClass === 'archer' ? 30 : 35
+        const baseDef = heroClass === 'warrior' ? 20 : heroClass === 'mage' ? 10 : heroClass === 'archer' ? 15 : 8
+        const baseCrit = heroClass === 'assassin' ? 0.35 : heroClass === 'archer' ? 0.25 : 0.1
+
+        set({
+          hero: {
+            id: Date.now().toString(),
+            name,
+            class: heroClass,
+            level: 1,
+            exp: 0,
+            hp: baseHp,
+            maxHp: baseHp,
+            attack: baseAtk,
+            defense: baseDef,
+            critRate: baseCrit,
+          },
+          quests: QUESTS.map(q => ({ id: q.id, progress: 0, claimed: false })),
+          transactions: [createTransaction('earn', 100)],
+        })
       },
 
-      startBattle: () => set({ isAutoBattle: true }),
-      stopBattle: () => set({ isAutoBattle: false }),
+      startBattle: () => {
+        const { hero, battle, crystals, quests, transactions } = get()
+        if (!hero) return
 
-      autoBattle: () => {
-        const state = get()
-        if (!state.hero || state.hero.hp <= 0) {
-          set({ isAutoBattle: false })
+        if (!battle) {
+          const monsterKey = MONSTER_KEYS[Math.floor(Math.random() * MONSTER_KEYS.length)]
+          const monster = MONSTERS[monsterKey]
+          set({
+            battle: {
+              monster: monsterKey,
+              monsterHp: monster.hp,
+              heroHp: hero.hp,
+            },
+          })
           return
         }
 
-        // Create monster based on hero level
-        const monsterIndex = Math.min(state.hero.level - 1, MONSTERS.length - 1)
-        const m = MONSTERS[monsterIndex]
-        const levelMultiplier = 1 + (state.hero.level - 1) * 0.2
-        const monster: Monster = {
-          id: generateId(),
-          name: m.name,
-          emoji: m.emoji,
-          hp: Math.floor(m.hp * levelMultiplier),
-          maxHp: Math.floor(m.hp * levelMultiplier),
-          attack: Math.floor(m.attack * levelMultiplier),
-          defense: Math.floor(m.defense * levelMultiplier),
-          crystals: Math.floor(m.crystals * levelMultiplier),
+        const monster = MONSTERS[battle.monster]
+        const newMonsterHp = Math.max(0, battle.monsterHp - hero.attack)
+        const newHeroHp = Math.max(0, battle.heroHp - monster.attack)
+
+        if (newMonsterHp === 0) {
+          const newExp = hero.exp + 10
+          const levelUp = newExp >= hero.level * 100
+          
+          set({
+            battle: null,
+            crystals: crystals + monster.crystals,
+            hero: {
+              ...hero,
+              exp: levelUp ? 0 : newExp,
+              level: levelUp ? hero.level + 1 : hero.level,
+              hp: hero.maxHp,
+            },
+            transactions: [createTransaction('earn', monster.crystals), ...transactions].slice(0, 20),
+            quests: quests.map(q => {
+              const quest = QUESTS.find(x => x.id === q.id)
+              if (quest?.type === 'battle') {
+                return { ...q, progress: q.progress + 1 }
+              }
+              if (quest?.type === 'collect' && monster.crystals > 0) {
+                return { ...q, progress: q.progress + monster.crystals }
+              }
+              return q
+            }),
+          })
+        } else if (newHeroHp === 0) {
+          set({
+            battle: null,
+            hero: { ...hero, hp: hero.maxHp },
+          })
+        } else {
+          set({
+            battle: {
+              ...battle,
+              monsterHp: newMonsterHp,
+              heroHp: newHeroHp,
+            },
+          })
         }
-        set({ currentMonster: monster, battleCount: state.battleCount + 1 })
       },
 
-      heal: (amount) => {
-        const hero = get().hero
-        if (!hero) return
+      toggleBattling: () => set(state => ({ isBattling: !state.isBattling })),
+
+      buyItem: (itemId) => {
+        const { crystals, transactions } = get()
+        const item = SHOP_ITEMS.find(i => i.id === itemId)
+        if (!item || crystals < item.crystalPrice) return
+        
         set({
-          hero: {
-            ...hero,
-            hp: Math.min(hero.maxHp, hero.hp + amount),
-          },
+          crystals: crystals - item.crystalPrice,
+          transactions: [createTransaction('spend', item.crystalPrice), ...transactions].slice(0, 20),
         })
       },
 
-      buyItem: (itemId) => {
-        const state = get()
-        const item = SHOP_ITEMS.find(i => i.id === itemId)
-        if (!item || !state.hero) return false
+      claimQuest: (questId) => {
+        const { quests, crystals, transactions, hero } = get()
+        const quest = QUESTS.find(q => q.id === questId)
+        const playerQuest = quests.find(q => q.id === questId)
+        if (!quest || !playerQuest || playerQuest.progress < quest.target || playerQuest.claimed) return
 
-        if (item.currency === 'gold' && state.hero.gold >= item.price) {
-          set({
-            hero: { ...state.hero, gold: state.hero.gold - item.price },
-          })
-          if (item.id === 'hp_potion') get().heal(50)
-          return true
-        }
-        if (item.currency === 'crystals' && state.hero.crystals >= item.price) {
-          set({
-            hero: { ...state.hero, crystals: state.hero.crystals - item.price },
-          })
-          if (item.id === 'mega_potion') get().heal(state.hero.maxHp)
-          return true
-        }
-        return false
+        set({
+          crystals: crystals + quest.reward,
+          quests: quests.map(q => q.id === questId ? { ...q, claimed: true } : q),
+          transactions: [createTransaction('earn', quest.reward), ...transactions].slice(0, 20),
+          hero: hero ? {
+            ...hero,
+            level: quest.type === 'level' ? Math.max(hero.level, quest.target) : hero.level,
+          } : null,
+        })
       },
 
       addCrystals: (amount) => {
-        const hero = get().hero
-        if (!hero) return
+        const { crystals, transactions } = get()
         set({
-          hero: { ...hero, crystals: hero.crystals + amount },
-          transactions: [
-            { id: generateId(), type: 'deposit', amount, timestamp: Date.now() },
-            ...get().transactions,
-          ],
+          crystals: crystals + amount,
+          transactions: [createTransaction('earn', amount), ...transactions].slice(0, 20),
         })
       },
-
-      withdraw: (amount) => {
-        const hero = get().hero
-        if (!hero || hero.crystals < amount) return
-        set({
-          hero: { ...hero, crystals: hero.crystals - amount },
-          pendingWithdraw: amount,
-          transactions: [
-            { id: generateId(), type: 'withdraw', amount, timestamp: Date.now() },
-            ...get().transactions,
-          ],
-        })
-      },
-
-      reset: () => set({
-        hero: null,
-        currentMonster: null,
-        battleLog: [],
-        isAutoBattle: false,
-        battleCount: 0,
-        pendingWithdraw: 0,
-        transactions: [],
-      }),
     }),
     { name: 'pixel-quest-storage' }
   )

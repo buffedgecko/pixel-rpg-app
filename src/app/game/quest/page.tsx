@@ -2,92 +2,67 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { useGameStore } from '@/store/gameStore'
+import { useGameStore, QUESTS } from '../../../store/gameStore'
 
 export default function QuestPage() {
-  const { hero, battleCount } = useGameStore()
-
-  if (!hero) return null
-
-  const quests = [
-    { id: 1, name: 'First Steps', desc: 'Complete 10 battles', target: 10, reward: 100, progress: battleCount },
-    { id: 2, name: 'Battle Hardened', desc: 'Complete 50 battles', target: 50, reward: 500, progress: battleCount },
-    { id: 3, name: 'War Veteran', desc: 'Complete 100 battles', target: 100, reward: 1000, progress: battleCount },
-    { id: 4, name: 'Level Master', desc: 'Reach level 5', target: 5, reward: 200, progress: hero.level },
-    { id: 5, name: 'Crystal Collector', desc: 'Collect 100 crystals', target: 100, reward: 50, progress: hero.crystals },
-  ]
+  const { quests: playerQuests, claimQuest, crystals } = useGameStore()
 
   return (
-    <div style={{ minHeight: '100vh', padding: '1rem', paddingBottom: '80px' }}>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>📜 Quests</h1>
-        
-        <div style={{ display: 'grid', gap: '0.75rem' }}>
-          {quests.map(quest => {
-            const completed = quest.progress >= quest.target
-            const progressPercent = Math.min(100, (quest.progress / quest.target) * 100)
-            
-            return (
-              <motion.div
-                key={quest.id}
-                style={{
-                  background: completed ? '#22c55e15' : '#1a1a2e',
-                  borderRadius: '12px',
-                  padding: '1rem',
-                  border: completed ? '1px solid #22c55e40' : '1px solid #374151',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <span style={{ fontWeight: 'bold' }}>{completed ? '✅' : '📋'} {quest.name}</span>
-                  <span style={{ color: '#f59e0b', fontSize: '0.875rem' }}>+{quest.reward} 💰</span>
-                </div>
-                <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginBottom: '0.5rem' }}>{quest.desc}</p>
-                
-                <div style={{ height: '6px', background: '#374151', borderRadius: '3px', overflow: 'hidden' }}>
-                  <div style={{
-                    width: `${progressPercent}%`,
-                    height: '100%',
-                    background: completed ? '#22c55e' : '#8b5cf6',
-                    transition: 'width 0.3s'
-                  }} />
-                </div>
-                <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: '0.25rem', textAlign: 'right' }}>
-                  {Math.min(quest.progress, quest.target)}/{quest.target}
-                </div>
-              </motion.div>
-            )
-          })}
-        </div>
-      </motion.div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+      <Link href="/game" className="text-purple-400 mb-4 inline-block">← Back</Link>
+      
+      <h1 className="text-2xl font-bold text-white mb-2">Quests</h1>
+      <div className="flex items-center gap-2 text-purple-400 mb-4">
+        <span>💎</span>
+        <span className="font-bold">{crystals.toLocaleString()}</span>
+      </div>
 
-      {/* Bottom Navigation */}
-      <nav style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        background: '#1a1a2e',
-        borderTop: '1px solid #374151',
-        display: 'flex',
-        justifyContent: 'space-around',
-        padding: '0.75rem 0',
-      }}>
-        {[
-          { href: '/game', icon: '⚔️', label: 'Battle' },
-          { href: '/game/hero', icon: '🦸', label: 'Hero' },
-          { href: '/game/shop', icon: '🛒', label: 'Shop' },
-          { href: '/game/quest', icon: '📜', label: 'Quest' },
-          { href: '/game/wallet', icon: '👛', label: 'Wallet' },
-        ].map(item => (
-          <Link key={item.href} href={item.href} style={{ textAlign: 'center', textDecoration: 'none' }}>
-            <div style={{ fontSize: '1.25rem' }}>{item.icon}</div>
-            <div style={{ fontSize: '0.625rem', color: '#9ca3af' }}>{item.label}</div>
-          </Link>
-        ))}
-      </nav>
+      <div className="space-y-3">
+        {QUESTS.map(quest => {
+          const playerQuest = playerQuests.find(pq => pq.id === quest.id)
+          const progress = playerQuest?.progress || 0
+          const isComplete = progress >= quest.target
+          const isClaimed = playerQuest?.claimed
+
+          return (
+            <motion.div
+              key={quest.id}
+              className="bg-slate-800/50 rounded-xl p-4 border border-slate-700"
+            >
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                  <div className="text-white font-semibold">{quest.name}</div>
+                  <div className="text-slate-400 text-sm">{quest.description}</div>
+                </div>
+                <div className="text-purple-400 font-bold">💎 {quest.reward}</div>
+              </div>
+
+              <div className="h-2 bg-slate-700 rounded-full overflow-hidden mb-2">
+                <div
+                  className={`h-full ${isComplete ? 'bg-green-500' : 'bg-purple-500'}`}
+                  style={{ width: `${Math.min((progress / quest.target) * 100, 100)}%` }}
+                />
+              </div>
+
+              <div className="flex justify-between items-center">
+                <span className="text-slate-400 text-sm">{progress}/{quest.target}</span>
+                {isComplete && !isClaimed && (
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => claimQuest(quest.id)}
+                    className="px-3 py-1 bg-green-600 hover:bg-green-500 text-white rounded-lg text-sm font-semibold"
+                  >
+                    Claim
+                  </motion.button>
+                )}
+                {isClaimed && (
+                  <span className="text-green-400 text-sm">✓ Claimed</span>
+                )}
+              </div>
+            </motion.div>
+          )
+        })}
+      </div>
     </div>
   )
 }

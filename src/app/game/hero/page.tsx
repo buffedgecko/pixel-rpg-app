@@ -2,105 +2,61 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { useGameStore, HERO_CLASSES } from '@/store/gameStore'
+import { useGameStore, HERO_CLASSES } from '../../../store/gameStore'
 
 export default function HeroPage() {
-  const { hero, reset } = useGameStore()
-
+  const { hero } = useGameStore()
+  
   if (!hero) return null
 
   const heroClass = HERO_CLASSES[hero.class]
 
   return (
-    <div style={{ minHeight: '100vh', padding: '1rem', paddingBottom: '80px' }}>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        style={{
-          background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
-          borderRadius: '24px',
-          padding: '2rem',
-          textAlign: 'center',
-          border: `2px solid ${heroClass.color}40`,
-        }}
-      >
-        <div style={{ fontSize: '5rem', marginBottom: '1rem' }} className="animate-float">
-          {heroClass.emoji}
-        </div>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>{hero.name}</h1>
-        <p style={{ color: heroClass.color, marginBottom: '1.5rem' }}>
-          Lv.{hero.level} {heroClass.name}
-        </p>
-
-        <div style={{ display: 'grid', gap: '1rem', marginBottom: '2rem' }}>
-          {[
-            { label: 'HP', value: `${hero.hp}/${hero.maxHp}`, icon: '❤️', color: '#ef4444' },
-            { label: 'Attack', value: hero.attack, icon: '⚔️', color: '#ef4444' },
-            { label: 'Defense', value: hero.defense, icon: '🛡️', color: '#3b82f6' },
-            { label: 'Crit Rate', value: `${hero.critRate * 100}%`, icon: '🎯', color: '#f59e0b' },
-            { label: 'Gold', value: hero.gold, icon: '💰', color: '#f59e0b' },
-            { label: 'Crystals', value: hero.crystals, icon: '💎', color: '#8b5cf6' },
-          ].map(stat => (
-            <div key={stat.label} style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '1rem',
-              background: '#0f0f23',
-              borderRadius: '12px',
-            }}>
-              <span style={{ color: '#9ca3af' }}>{stat.icon} {stat.label}</span>
-              <span style={{ fontWeight: 'bold', color: stat.color }}>{stat.value}</span>
-            </div>
-          ))}
-        </div>
-
-        <button
-          onClick={() => {
-            if (confirm('Reset all progress?')) {
-              reset()
-              window.location.href = '/create'
-            }
-          }}
-          style={{
-            width: '100%',
-            padding: '1rem',
-            background: '#ef444420',
-            border: '1px solid #ef4444',
-            borderRadius: '12px',
-            color: '#ef4444',
-            cursor: 'pointer',
-          }}
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+      <Link href="/game" className="text-purple-400 mb-4 inline-block">← Back</Link>
+      
+      <div className="text-center mb-6">
+        <motion.div
+          animate={{ scale: [1, 1.1, 1] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+          className="text-6xl mb-4"
         >
-          🗑️ Reset Progress
-        </button>
-      </motion.div>
+          {heroClass.emoji}
+        </motion.div>
+        <h1 className="text-2xl font-bold text-white">{hero.name}</h1>
+        <p className="text-purple-300">{heroClass.name} • Level {hero.level}</p>
+      </div>
 
-      {/* Bottom Navigation */}
-      <nav style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        background: '#1a1a2e',
-        borderTop: '1px solid #374151',
-        display: 'flex',
-        justifyContent: 'space-around',
-        padding: '0.75rem 0',
-      }}>
-        {[
-          { href: '/game', icon: '⚔️', label: 'Battle' },
-          { href: '/game/hero', icon: '🦸', label: 'Hero' },
-          { href: '/game/shop', icon: '🛒', label: 'Shop' },
-          { href: '/game/quest', icon: '📜', label: 'Quest' },
-          { href: '/game/wallet', icon: '👛', label: 'Wallet' },
-        ].map(item => (
-          <Link key={item.href} href={item.href} style={{ textAlign: 'center', textDecoration: 'none' }}>
-            <div style={{ fontSize: '1.25rem' }}>{item.icon}</div>
-            <div style={{ fontSize: '0.625rem', color: '#9ca3af' }}>{item.label}</div>
-          </Link>
-        ))}
-      </nav>
+      <div className="space-y-3">
+        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+          <div className="flex justify-between text-sm mb-1">
+            <span className="text-slate-400">EXP</span>
+            <span className="text-white">{hero.exp}/{hero.level * 100}</span>
+          </div>
+          <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+            <div className="h-full bg-purple-500" style={{ width: `${(hero.exp / (hero.level * 100)) * 100}%` }} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-slate-800/50 rounded-xl p-3 border border-slate-700">
+            <div className="text-red-400 text-sm">HP</div>
+            <div className="text-white font-bold">{hero.hp}</div>
+          </div>
+          <div className="bg-slate-800/50 rounded-xl p-3 border border-slate-700">
+            <div className="text-orange-400 text-sm">ATK</div>
+            <div className="text-white font-bold">{hero.attack}</div>
+          </div>
+          <div className="bg-slate-800/50 rounded-xl p-3 border border-slate-700">
+            <div className="text-blue-400 text-sm">DEF</div>
+            <div className="text-white font-bold">{hero.defense}</div>
+          </div>
+          <div className="bg-slate-800/50 rounded-xl p-3 border border-slate-700">
+            <div className="text-yellow-400 text-sm">CRIT</div>
+            <div className="text-white font-bold">{(hero.critRate * 100).toFixed(0)}%</div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

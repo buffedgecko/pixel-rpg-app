@@ -2,32 +2,46 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useGameStore } from '@/store/gameStore'
+import { motion } from 'framer-motion'
+import { useGameStore } from '../store/gameStore'
 
 export default function HomePage() {
   const router = useRouter()
-  const hero = useGameStore(state => state.hero)
+  const { hero } = useGameStore()
 
   useEffect(() => {
     if (hero) {
-      router.replace('/game')
-    } else {
-      router.replace('/create')
+      router.push('/game')
     }
   }, [hero, router])
 
+  if (hero) return null
+
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%)'
-    }}>
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>⚔️</div>
-        <p style={{ color: '#9ca3af' }}>Loading...</p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="text-center"
+      >
+        <motion.div
+          animate={{ rotate: [0, 10, -10, 0] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+          className="text-8xl mb-6"
+        >
+          ⚔️
+        </motion.div>
+        <h1 className="text-4xl font-bold text-white mb-2">Pixel Quest</h1>
+        <p className="text-purple-300 mb-8">Idle RPG Adventure</p>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => router.push('/create')}
+          className="px-8 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-semibold"
+        >
+          Start Adventure
+        </motion.button>
+      </motion.div>
     </div>
   )
 }
